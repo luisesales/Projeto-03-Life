@@ -38,6 +38,7 @@ class Canvas {
   typedef unsigned long coord_t; //!< The pixel coordinate type.
   //== Constants
   static constexpr uint8_t image_depth = 4;  //!< Default value is RGBA (4 channels).
+  typedef const Canvas& const_reference;           //!< Reference to the value type.
 
  public:
   //=== Special members
@@ -73,6 +74,10 @@ class Canvas {
   /// Get the canvas pixels, as an array of `unsigned char`.
   const component_t* pixels(void) const
   { return m_pixels.data(); }
+  /// Acess the reference of the pos position element of the canvas
+  const_reference operator[](coord_t pos) const {
+    return m_pixels[pos];
+  }
 
  private:
   size_t m_width;                //!< The image width in pixel units.
