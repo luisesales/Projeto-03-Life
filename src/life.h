@@ -69,6 +69,6 @@ class SimulationLog{
     void insert(const std::string& key, unsigned long value);
     /// Recuperar a info do Log.
     unsigned long get(const std::string& key) const;
-}
+};
 
 #endif

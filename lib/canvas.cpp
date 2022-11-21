@@ -28,7 +28,7 @@ namespace life {
   //=== Members
   /// Clear the canvas with black color.
   void Canvas::clear(const Color& c = BLACK){
-    for(size_t i{0}; i <= m_pixels.size();i+=4){
+    for(size_t i{0}; i < m_pixels.size();i+=4){
       m_pixels[i] = c.channels[Color::R];
       m_pixels[i+1] = c.channels[Color::G];
       m_pixels[i+2] = c.channels[Color::B];
