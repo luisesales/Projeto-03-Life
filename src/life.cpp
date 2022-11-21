@@ -105,6 +105,7 @@ bool SimulationLog::stable(const std::string& key) const{
 
 class SimulationManager{
   private:
+  unordered_map<bool,char> p{{true , '@'},{false , '#'}};
   std::vector<std::vector<bool>> board; // Tabuleiro com as posições onde há células vivas
   size_t amount; // Quantidade de loops limite
   LifeCfg Cfg; // Configuração da Aplicação
@@ -119,6 +120,18 @@ class SimulationManager{
 
   // Atualizar as gerações
   void update(void);
+
+  // Printa o resultado de uma geração 
+  void print(){
+    string result{""};
+    for(auto x : board){
+      for(size_t i{0}; i < x.size();i++){
+        result+=p[x[i]];
+      }
+      result+="\n";
+    }
+    std::cout << result << std::endl;
+  }
 };
 
 /// Ctro
