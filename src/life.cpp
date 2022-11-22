@@ -4,6 +4,7 @@
  */
 
 #include "life.h"
+#include "tip.h"
 
 namespace life {
 /// Basic constructor that creates a life board with default dimensions.
@@ -69,29 +70,38 @@ SimulationManager::SimulationManager(const vector<vector<bool>>& input){
 }
 
 /// Atualiza as gerações de acordo com as regras
-void SimulationManager::update(void){
-  size_t generations{0};
-  string key{""},reason;
-  bool index{true};
+void SimulationManager::play(void){
+  size_t generations{0}; // Contador de gerações
+  string key{""}; // Chave de busca no banco de dados de gerações
+  string reason; // Razão para qual o programa vai parar
+  bool index{true}; // Controlador de continuidade do jogo
   while(index){  
+    // Checar se chegou ao limite de gerações
     if(generations >= amount){
       reason = "Atingiu o número de Gerações Desejado";
       index = false;
-    }else if(Cfg.extinct()){
+    }
+    // Checar se chegou a extinção
+    else if(Cfg.extinct()){
       reason = "Foi Extinto";
       index = false;
-    }else if(Log.stable(key)){
+    }
+    // Checar se chegou em estabilidade
+    else if(Log.stable(key)){
       reason = "Entrou em Estabilidade";
       index = false;
-    }else{
+    }
+    // Aplicar as regras e pular para proxima geração
+    else{
       key = Cfg.get_key();
       generations++;
+      SimulationManager::print();
     }
   }
 }
 /// Printa no console o resultado de uma geração
 void SimulationManager::print(void){
-    string result{""};
+    string result{""}; // String do que será mostrado no console
     for(auto x : board){
       for(size_t i{0}; i < x.size();i++){
         result+=p[x[i]];
@@ -102,7 +112,7 @@ void SimulationManager::print(void){
   }
 
 /// Lê as configurações do arquivo de configurações
-int SimulationManager::readConfig(int argc, char* argv[]){
+int SimulationManager::readConfig(void){
   TIP reader{ ".config/glife.ini" };
     // Check for any parser error.
     if (not reader.parsing_ok()) {
@@ -116,7 +126,8 @@ int SimulationManager::readConfig(int argc, char* argv[]){
         std::cout << ">>> Error while retrieving \"max_gen\" field." << '\n';
         std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
     } else {
-        std::cout << "Max gen is " << val << '\n';
+        //std::cout << "Max gen is " << val << '\n';
+        this->amount = val;
     }
 
     // Try to get user current active status.
@@ -125,7 +136,7 @@ int SimulationManager::readConfig(int argc, char* argv[]){
         std::cout << ">>> Error while retrieving \"generate_image\" field." << '\n';
         std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
     } else {
-        std::cout << "Generate Image situation is " << std::boolalpha << create_img << '\n';
+        //std::cout << "Generate Image situation is " << std::boolalpha << create_img << '\n';
     }
 
     // Try to get user current active status.
@@ -134,11 +145,11 @@ int SimulationManager::readConfig(int argc, char* argv[]){
         std::cout << ">>> Error while retrieving \"fps\" field." << '\n';
         std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
     } else {
-        std::cout << "FPS value is " << fps << '\n';
+        //std::cout << "FPS value is " << fps << '\n';
     }
 
-    std::cout << "\n>>> Pretty print:" << '\n';
-    std::cout << reader.pretty_print() << '\n';
+    // std::cout << "\n>>> Pretty print:" << '\n';
+    // std::cout << reader.pretty_print() << '\n';
     return EXIT_SUCCESS;
 }
 

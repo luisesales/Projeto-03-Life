@@ -22,12 +22,12 @@
 #include <iostream>
 #include <iomanip>
 
-#include "tip.h"
 #include "life.h"
 
 int main(int argc, char* argv[])
 {   
-    int r{life::SimulationManager::readConfig()};
+    int r{readConfig()};
+    play();
 
     return r;
 }

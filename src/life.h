@@ -71,7 +71,7 @@ class LifeCfg {
 
 class SimulationLog {
  private:
-  std::unordered_map<std::string, unsigned long> m_data_base;
+  std::unordered_map<std::string, unsigned long> m_data_base; // Banco de dados de todas as gerações do programa
 
  public:
   SimulationLog();
@@ -89,7 +89,7 @@ class SimulationLog {
 
 class SimulationManager{
   private:
-  unordered_map<bool,char> p{{true , '@'},{false , '#'}};
+  unordered_map<bool,char> p{{true , '@'},{false , '#'}}; // Transformador de tabuleiro para resultado no console
   std::vector<std::vector<bool>> board; // Tabuleiro com as posições onde há células vivas
   size_t amount; // Quantidade de loops limite
   LifeCfg Cfg; // Configuração da Aplicação
@@ -103,7 +103,7 @@ class SimulationManager{
   int readConfig(void);
 
   // Atualizar as gerações
-  void update(void);
+  void play(void);
 
   // Printa no console o resultado de uma geração 
   void print(void);
