@@ -7,30 +7,6 @@
 
 namespace life {
 /// Basic constructor that creates a life board with default dimensions.
-class LifeCfg {  
-  std::vector<Cell> m_alive;  // Lista de células vivas.
-  std::vector<Cell> m_dead;  // Lista de células mortas.
-
-
- public:
-  //Ctro.
-  LifeCfg(const vector<Cell>& input_cell);
-  // Retorna a chave associada a uma configuração.
-  std::string get_key(void) const;
-  // Retorna as células vivas
-  std::vector<Cell> LifeCfg::set_alive(void) const;
-  // Verifica se todas as células morreram
-  bool extinct(void) const;
-  // Atualiza as Células vivas pra uma nova geração de acordo com as regras
-  void update(const LifeCfg& target);
-  // Modifica as configurações por outra recebida por parâmetro
-  LifeCfg& operator=(const LifeCfg& _rhs);
-  // Compara duas configurações e retorna se são iguais o não
-  bool operator==(const LifeCfg&) const;
-  //
-  size_t rows(void) const;
-  size_t cols(void) const;
-};
 
 /// Ctro.
 LifeCfg::LifeCfg(const vector<Cell>& input_cell) {
@@ -64,23 +40,6 @@ LifeCfg& LifeCfg::operator=(const LifeCfg& target) {
   LifeCfg(target.m_alive);
 }
 
-// TODO
-class SimulationLog {
- private:
-  std::unordered_map<std::string, unsigned long> m_data_base;
-
- public:
-  SimulationLog();
-  // Retorna true se chave já existir.
-  bool find(const std::string& key) const;
-  // Inserir uma nova configuração.
-  void insert(const std::string& key, unsigned long value);
-  // Recuperar a info do Log.
-  unsigned long get(const std::string& key) const;
-  // Encerra o programa no caso de encontrar uma estabilidade de gerações
-  bool stable(const std::string& key) const;
-
-};
 
 /// Procura por configuração enviada por parâmetro
 bool SimulationLog::find(const std::string& key) const{
@@ -103,26 +62,35 @@ bool SimulationLog::stable(const std::string& key) const{
 }
 
 
-class SimulationManager{
-  private:
-  unordered_map<bool,char> p{{true , '@'},{false , '#'}};
-  std::vector<std::vector<bool>> board; // Tabuleiro com as posições onde há células vivas
-  size_t amount; // Quantidade de loops limite
-  LifeCfg Cfg; // Configuração da Aplicação
-  SimulationLog Log // Banco de dados de gerações
 
-  public:
-  // Ctro
-  SimulationManager(const vector<vector<bool>>& input);
+/// Ctro
+SimulationManager::SimulationManager(const vector<vector<bool>>& input){
+    this->board = input;
+}
 
-  // Ler as configs enviadas pelo arquivo de configuração
-  void readConfig(void);
-
-  // Atualizar as gerações
-  void update(void);
-
-  // Printa o resultado de uma geração 
-  void print(){
+/// Atualiza as gerações de acordo com as regras
+void SimulationManager::update(void){
+  size_t generations{0};
+  string key{""},reason;
+  bool index{true};
+  while(index){  
+    if(generations >= amount){
+      reason = "Atingiu o número de Gerações Desejado";
+      index = false;
+    }else if(Cfg.extinct()){
+      reason = "Foi Extinto";
+      index = false;
+    }else if(Log.stable(key)){
+      reason = "Entrou em Estabilidade";
+      index = false;
+    }else{
+      key = Cfg.get_key();
+      generations++;
+    }
+  }
+}
+/// Printa no console o resultado de uma geração
+void SimulationManager::print(void){
     string result{""};
     for(auto x : board){
       for(size_t i{0}; i < x.size();i++){
@@ -132,21 +100,46 @@ class SimulationManager{
     }
     std::cout << result << std::endl;
   }
-};
 
-/// Ctro
-SimulationManager::SimulationManager(const vector<vector<bool>>& input){
-    this->board = input;
-}
+/// Lê as configurações do arquivo de configurações
+int SimulationManager::readConfig(int argc, char* argv[]){
+  TIP reader{ ".config/glife.ini" };
+    // Check for any parser error.
+    if (not reader.parsing_ok()) {
+        std::cerr << ">> Sorry, parser failed with message: " << reader.parser_error_msg() << "\n";
+        return 1;
+    }
 
-void SimulationManager::update(void){
-  size_t generations{0};
-  string key{""};
-  while(generations < amount || !Cfg.extinct() || !Log.stable(key)){
-    key = Cfg.get_key();
-    generations++;
+    // Try to get pi value.
+    auto val = reader.get_int("ROOT", "max_gen");
+    if (not reader.parsing_ok()) {
+        std::cout << ">>> Error while retrieving \"max_gen\" field." << '\n';
+        std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
+    } else {
+        std::cout << "Max gen is " << val << '\n';
+    }
 
-  }
+    // Try to get user current active status.
+    auto create_img = reader.get_bool("image", "generate_image");
+    if (not reader.parsing_ok()) {
+        std::cout << ">>> Error while retrieving \"generate_image\" field." << '\n';
+        std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
+    } else {
+        std::cout << "Generate Image situation is " << std::boolalpha << create_img << '\n';
+    }
+
+    // Try to get user current active status.
+    auto fps = reader.get_int("text", "fps");
+    if (not reader.parsing_ok()) {
+        std::cout << ">>> Error while retrieving \"fps\" field." << '\n';
+        std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
+    } else {
+        std::cout << "FPS value is " << fps << '\n';
+    }
+
+    std::cout << "\n>>> Pretty print:" << '\n';
+    std::cout << reader.pretty_print() << '\n';
+    return EXIT_SUCCESS;
 }
 
 }

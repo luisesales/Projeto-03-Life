@@ -23,45 +23,11 @@
 #include <iomanip>
 
 #include "tip.h"
+#include "life.h"
 
 int main(int argc, char* argv[])
-{
-    TIP reader{ ".config/glife.ini" };
-    // Check for any parser error.
-    if (not reader.parsing_ok()) {
-        std::cerr << ">> Sorry, parser failed with message: " << reader.parser_error_msg() << "\n";
-        return 1;
-    }
+{   
+    int r{life::SimulationManager::readConfig()};
 
-    // Try to get pi value.
-    auto val = reader.get_int("ROOT", "max_gen");
-    if (not reader.parsing_ok()) {
-        std::cout << ">>> Error while retrieving \"max_gen\" field." << '\n';
-        std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
-    } else {
-        std::cout << "Max gen is " << val << '\n';
-    }
-
-    // Try to get user current active status.
-    auto create_img = reader.get_bool("image", "generate_image");
-    if (not reader.parsing_ok()) {
-        std::cout << ">>> Error while retrieving \"generate_image\" field." << '\n';
-        std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
-    } else {
-        std::cout << "Generate Image situation is " << std::boolalpha << create_img << '\n';
-    }
-
-    // Try to get user current active status.
-    auto fps = reader.get_int("text", "fps");
-    if (not reader.parsing_ok()) {
-        std::cout << ">>> Error while retrieving \"fps\" field." << '\n';
-        std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
-    } else {
-        std::cout << "FPS value is " << fps << '\n';
-    }
-
-    std::cout << "\n>>> Pretty print:" << '\n';
-    std::cout << reader.pretty_print() << '\n';
-
-    return EXIT_SUCCESS;
+    return r;
 }

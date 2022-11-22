@@ -42,33 +42,74 @@ struct Cell {
 namespace life {
 
 /// A life configuration.
-class LifeCfg {
+class LifeCfg {  
+  std::vector<Cell> m_alive;  // Lista de células vivas.
+  //std::vector<Cell> m_dead;  // Lista de células mortas.
+
 
  public:
-    LifeCfg();  // lines, columns
-    ~LifeCfg(){ /* empty */ };
-    /* void set_alive(const std::vector<Location2>&);
-    void update(void);
-    std::string to_string(void) const;
-    bool operator==(const LifeCfg&) const;
-    LifeCfg& operator=(const LifeCfg& _rhs);
-    bool extinct(void) const;
-    size_type rows(void) const;
-    size_type cols(void) const; */
+  //Ctro.
+  LifeCfg(const vector<Cell>& input_cell = {});
+  // Retorna a chave associada a uma configuração.
+  std::string get_key(void) const;
+  // Retorna as células vivas
+  std::vector<Cell> LifeCfg::set_alive(void) const;
+  // Verifica se todas as células morreram
+  bool extinct(void) const;
+  // Atualiza as Células vivas pra uma nova geração de acordo com as regras
+  void update(const LifeCfg& target);
+  // Modifica as configurações por outra recebida por parâmetro
+  LifeCfg& operator=(const LifeCfg& _rhs);
+  // Compara duas configurações e retorna se são iguais o não
+  bool operator==(const LifeCfg&) const;
+  //
+  size_t rows(void) const;
+  size_t cols(void) const;
 };
 
-}  // namespace life
+ 
 
-class SimulationLog{
+class SimulationLog {
+ private:
+  std::unordered_map<std::string, unsigned long> m_data_base;
 
  public:
-    SimulationLog();
-    /// Retorna true se chave já existir.
-    bool find(const std::string& key) const;
-    /// Inserir uma nova configuração.
-    void insert(const std::string& key, unsigned long value);
-    /// Recuperar a info do Log.
-    unsigned long get(const std::string& key) const;
+  SimulationLog();
+  // Retorna true se chave já existir.
+  bool find(const std::string& key) const;
+  // Inserir uma nova configuração.
+  void insert(const std::string& key, unsigned long value);
+  // Recuperar a info do Log.
+  unsigned long get(const std::string& key) const;
+  // Encerra o programa no caso de encontrar uma estabilidade de gerações
+  bool stable(const std::string& key) const;
+
 };
 
+
+class SimulationManager{
+  private:
+  unordered_map<bool,char> p{{true , '@'},{false , '#'}};
+  std::vector<std::vector<bool>> board; // Tabuleiro com as posições onde há células vivas
+  size_t amount; // Quantidade de loops limite
+  LifeCfg Cfg; // Configuração da Aplicação
+  SimulationLog Log; // Banco de dados de gerações
+
+  public:
+  // Ctro
+  SimulationManager(const vector<vector<bool>>& input);
+
+  // Ler as configs enviadas pelo arquivo de configuração
+  int readConfig(void);
+
+  // Atualizar as gerações
+  void update(void);
+
+  // Printa no console o resultado de uma geração 
+  void print(void);
+
+};
+
+
+} // namespace life
 #endif
