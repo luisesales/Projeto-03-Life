@@ -97,7 +97,7 @@ class SimulationManager{
 
   public:
   // Ctro
-  SimulationManager(const vector<vector<bool>>& input);
+  SimulationManager(const vector<vector<bool>>& input = {{}});
 
   // Ler as configs enviadas pelo arquivo de configuração
   int readConfig(void);

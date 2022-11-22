@@ -26,8 +26,9 @@
 
 int main(int argc, char* argv[])
 {   
-    int r{readConfig()};
-    play();
+    life::SimulationManager s;
+    int r{s.readConfig()};
+    s.play();
 
     return r;
 }
