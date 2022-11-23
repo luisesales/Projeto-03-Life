@@ -18,10 +18,12 @@
 #include <iostream>
 #include <set>
 #include <sstream>  // std::ostringstream
+#include <fstream>
 #include <stdexcept>
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <ctype.h>
 
 using std::cerr;
 using std::cout;

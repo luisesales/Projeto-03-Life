@@ -113,10 +113,17 @@ void SimulationManager::print(void){
 
 /// Lê as configurações do arquivo de configurações
 int SimulationManager::readConfig(void){
+  std::ifstream bReader; // Leitor do Board
+  char * line; // Variável onde vai ser slavo cada linha
+  size_t nCol; // Quantidade de colunas do Tabuleiro
+  size_t nLin; // Quantidade de Linhas do Tabuleiro
+  size_t aux{0}; // Auxiliar para cessar todas as linhas do tabuleiro
+  char cel; // Caractere que vai determinar onde tem as células vivas
+
   TIP reader{ ".config/glife.ini" };
     // Check for any parser error.
     if (not reader.parsing_ok()) {
-        std::cerr << ">> Sorry, parser failed with message: " << reader.parser_error_msg() << "\n";
+      std::cerr << ">> Sorry, parser failed with message: " << reader.parser_error_msg() << "\n";
         return 1;
     }
 
@@ -148,8 +155,45 @@ int SimulationManager::readConfig(void){
         //std::cout << "FPS value is " << fps << '\n';
     }
 
-    // std::cout << "\n>>> Pretty print:" << '\n';
-    // std::cout << reader.pretty_print() << '\n';
+    // Lê-se o arquivo
+    bReader.open(".config/board.txt");
+
+    // Verifica se foi aberto com sucesso
+    if(!bReader.is_open()){
+      std::cout << ">>> Error while opening board file" << '\n';
+      return 1;
+    }
+    // Lê-se a quantidade de linhas e colunas
+    bReader.getline(line,3);
+    // Verifica-se se a primeira linha é válida
+    if(isdigit(line[0]) && line[1] == ' ' && isdigit(line[2])){
+      nLin = (size_t) line[0];
+      nCol = (size_t) line[2];
+
+      // Lê-se o caractere que determina onde há células
+      bReader.getline(line,1);
+      cel = line[0];
+
+      // Vai pegar cada linha do tabuleiro
+      while(bReader.getline(line,nCol) && aux < nLin){
+        string l = line;
+        for(size_t i{0}; i < nCol;i++){
+          if(l[i] == cel){
+            board[aux][i] = 1;
+
+          }
+          else{
+            board[aux][i] = 0;
+          }
+        }
+        aux++;
+      }
+    }
+    else{
+      std::cout << ">>> Error while reading Lines and Columns" << '\n';
+      return 1;
+    }
+    bReader.close();
     return EXIT_SUCCESS;
 }
 
