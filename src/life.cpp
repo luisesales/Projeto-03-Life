@@ -75,6 +75,7 @@ void SimulationManager::play(void){
   string key{""}; // Chave de busca no banco de dados de gerações
   string reason; // Razão para qual o programa vai parar
   bool index{true}; // Controlador de continuidade do jogo
+  
   while(index){  
     // Checar se chegou ao limite de gerações
     if(generations >= amount){
@@ -164,14 +165,13 @@ int SimulationManager::readConfig(void){
     } 
 
     // Lendo o tamanho do pixel virtual
-    auto BlockS = reader.get_str("image","block_size");
+    auto BlockS = reader.get_int("image","block_size");
     if (not reader.parsing_ok()) {
         std::cout << ">>> Error while retrieving \"block_size\" field." << '\n';
         std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
     } 
 
-    // Aplicando valores ao canvas
-    Can = {};
+    
 
     // Try to get user current active status.
     auto create_img = reader.get_bool("image", "generate_image");
@@ -190,6 +190,9 @@ int SimulationManager::readConfig(void){
     } else {
         //std::cout << "FPS value is " << fps << '\n';
     }
+    Canvas Caux(nCol,nLin,BlockS);  // Canvas auxiliar que será jogado ao canvas principal
+    // Aplica-se cor de fundo do canvas
+    Caux.clear(life::color_pallet[colorBkg]);
 
     // Lê-se o arquivo
     bReader.open(".config/board.txt");
@@ -209,7 +212,7 @@ int SimulationManager::readConfig(void){
       // Lê-se o caractere que determina onde há células
       bReader.getline(line,1);
       cel = line[0];
-
+      
       // Vai pegar cada linha do tabuleiro
       while(bReader.getline(line,nCol) && aux < nLin){
         string l = line;
@@ -217,6 +220,8 @@ int SimulationManager::readConfig(void){
           if(l[i] == cel){
             // Determina onde no board há células
             board[aux][i] = 1;
+            // Aplica a Cor de célula viva no Canvas
+            Caux.pixel(aux,i,life::color_pallet[colorA]);
             // Adiciona um objeto de Cell ao Vector auxiliar
             CfgR.push_back({aux,i});
           }
@@ -226,6 +231,7 @@ int SimulationManager::readConfig(void){
         }
         aux++;
       }
+
       // Atualiza o Cfg com o vector auxiliar
       Cfg.update(CfgR);
     }
@@ -234,6 +240,10 @@ int SimulationManager::readConfig(void){
       return 1;
     }
     bReader.close();
+
+    // Aplicando valores ao canvas
+    Can = Caux;
+
     return EXIT_SUCCESS;
 }
 

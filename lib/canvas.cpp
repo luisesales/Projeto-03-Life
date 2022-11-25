@@ -12,7 +12,6 @@ namespace life {
     m_width = w;
     m_height= h;
     m_block_size = bs;
-
     m_pixels.reserve(w*h*image_depth);
   }
     /// Destructor.
