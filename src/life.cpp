@@ -70,11 +70,14 @@ SimulationManager::SimulationManager(const vector<vector<bool>>& input){
 }
 
 /// Atualiza as gerações de acordo com as regras
-void SimulationManager::play(void){
+string SimulationManager::play(void){
   size_t generations{0}; // Contador de gerações
   string key{""}; // Chave de busca no banco de dados de gerações
   string reason; // Razão para qual o programa vai parar
   bool index{true}; // Controlador de continuidade do jogo
+  vector<vector<bool>> checked; // Verificador sobre as casas já acessadas de cada geração
+  short neighbor; // Contador de Vizinhos por celulas
+  vector<vector<bool>> nBoard; // Tabuleiro para a proxima geração
   
   while(index){  
     // Checar se chegou ao limite de gerações
@@ -104,7 +107,31 @@ void SimulationManager::play(void){
       generations++;
 
       // Atualiza-se o tabuleiro pra nova geração
-
+      // Reiniciamos o tabuleiro para ler  a proxima geração
+      nBoard.clear();
+      for(size_t i{0}; i < board.size();i++){
+        for (size_t j {0}; j < board[i].size();j++){
+          // Reiniciamos o número de vizinhos para cada caso de teste
+          neighbor = 0;
+          for(short x{-1};x <= 1;x++){
+            for(short y{-1};y <= 1;y++){
+              // Verifica-se se a posição de vizinho já foi checada
+              if(checked[i+x][j+y] == 0){
+                // Passa-se em todas as posições vizinhas daquela célula
+                if(board[i+x][j+y] == 1 && (y+j != j || x+i != i)){
+                  neighbor++;
+                }
+              }
+            }  
+          }
+          // Verifica-se as condições de acordo com as regras do jogo
+          if(neighbor >= 4 || neighbor <= 1) nBoard[i][j] = 0;
+          else if(neighbor == 3) nBoard[i][j] = 1;
+          checked[i][j] = 1;
+        }
+      }
+      // Atualiza-se o tabuleiro
+      board = nBoard;
       // Printa-se o novo tabuleiro
       SimulationManager::print();
     }
@@ -243,6 +270,7 @@ int SimulationManager::readConfig(void){
 
     // Aplicando valores ao canvas
     Can = Caux;
+
 
     return EXIT_SUCCESS;
 }

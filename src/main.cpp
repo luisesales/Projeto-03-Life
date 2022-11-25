@@ -21,6 +21,7 @@
 #include <cstdlib>  // EXIT_SUCCESS
 #include <iostream>
 #include <iomanip>
+#include <string>
 
 #include "life.h"
 
@@ -29,7 +30,8 @@ int main(int argc, char* argv[])
     life::SimulationManager s;
     int r{s.readConfig()};
     s.print();
-    s.play();
+    std::string reason = s.play();
+    std::cout << "Fim de Jogo: " << reason << std::endl;
 
     return r;
 }

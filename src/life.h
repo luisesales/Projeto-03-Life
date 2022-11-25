@@ -106,7 +106,7 @@ class SimulationManager{
   int readConfig(void);
 
   // Atualizar as gerações
-  void play(void);
+  std::string play(void);
 
   // Printa no console o resultado de uma geração 
   void print(void);
