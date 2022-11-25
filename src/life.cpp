@@ -93,8 +93,18 @@ void SimulationManager::play(void){
     }
     // Aplicar as regras e pular para proxima geração
     else{
+      // Recolhe a Chave
       key = Cfg.get_key();
+
+      // Adiciona chave no database caso não existe ou adiciona 1 ao contador caso a chave já exista 
+      Log.insert(key,1);
+
+      // Aumenta-se o contador de gerações atual
       generations++;
+
+      // Atualiza-se o tabuleiro pra nova geração
+
+      // Printa-se o novo tabuleiro
       SimulationManager::print();
     }
   }
@@ -119,6 +129,7 @@ int SimulationManager::readConfig(void){
   size_t nLin; // Quantidade de Linhas do Tabuleiro
   size_t aux{0}; // Auxiliar para cessar todas as linhas do tabuleiro
   char cel; // Caractere que vai determinar onde tem as células vivas
+  vector<Cell> CfgR; // VEctor que irá ser transformado no m_alive
 
   TIP reader{ ".config/glife.ini" };
     // Check for any parser error.
@@ -136,6 +147,31 @@ int SimulationManager::readConfig(void){
         //std::cout << "Max gen is " << val << '\n';
         this->amount = val;
     }
+    // Ler dados do canvas
+
+    // Lendo a cor dos blocos onde há células
+    auto colorA = reader.get_str("image","alive");
+    if (not reader.parsing_ok()) {
+        std::cout << ">>> Error while retrieving \"alive\" field." << '\n';
+        std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
+    } 
+
+    // Lendo a cor dos blocos onde não há ceĺulas
+    auto colorBkg = reader.get_str("image","bkg");
+    if (not reader.parsing_ok()) {
+        std::cout << ">>> Error while retrieving \"bkg\" field." << '\n';
+        std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
+    } 
+
+    // Lendo o tamanho do pixel virtual
+    auto BlockS = reader.get_str("image","block_size");
+    if (not reader.parsing_ok()) {
+        std::cout << ">>> Error while retrieving \"block_size\" field." << '\n';
+        std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
+    } 
+
+    // Aplicando valores ao canvas
+    Can = {};
 
     // Try to get user current active status.
     auto create_img = reader.get_bool("image", "generate_image");
@@ -179,8 +215,10 @@ int SimulationManager::readConfig(void){
         string l = line;
         for(size_t i{0}; i < nCol;i++){
           if(l[i] == cel){
+            // Determina onde no board há células
             board[aux][i] = 1;
-
+            // Adiciona um objeto de Cell ao Vector auxiliar
+            CfgR.push_back({aux,i});
           }
           else{
             board[aux][i] = 0;
@@ -188,6 +226,8 @@ int SimulationManager::readConfig(void){
         }
         aux++;
       }
+      // Atualiza o Cfg com o vector auxiliar
+      Cfg.update(CfgR);
     }
     else{
       std::cout << ">>> Error while reading Lines and Columns" << '\n';

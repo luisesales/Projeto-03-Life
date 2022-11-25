@@ -96,6 +96,7 @@ class SimulationManager{
   size_t amount; // Quantidade de loops limite
   LifeCfg Cfg; // Configuração da Aplicação
   SimulationLog Log; // Banco de dados de gerações
+  Canvas Can; // Gerador de Imagens Canvas
 
   public:
   // Ctro
