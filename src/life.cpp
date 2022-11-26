@@ -78,6 +78,7 @@ string SimulationManager::play(void){
   vector<vector<bool>> checked; // Verificador sobre as casas já acessadas de cada geração
   short neighbor; // Contador de Vizinhos por celulas
   vector<vector<bool>> nBoard; // Tabuleiro para a proxima geração
+  vector<Cell> n_alive; // Vector que atualizará o m_alive para a proxima geração
   
   while(index){  
     // Checar se chegou ao limite de gerações
@@ -109,6 +110,7 @@ string SimulationManager::play(void){
       // Atualiza-se o tabuleiro pra nova geração
       // Reiniciamos o tabuleiro para ler  a proxima geração
       nBoard.clear();
+      n_alive.clear();
       for(size_t i{0}; i < board.size();i++){
         for (size_t j {0}; j < board[i].size();j++){
           // Reiniciamos o número de vizinhos para cada caso de teste
@@ -126,12 +128,17 @@ string SimulationManager::play(void){
           }
           // Verifica-se as condições de acordo com as regras do jogo
           if(neighbor >= 4 || neighbor <= 1) nBoard[i][j] = 0;
-          else if(neighbor == 3) nBoard[i][j] = 1;
+          else if(neighbor == 3) {
+            nBoard[i][j] = 1;
+            n_alive.push_back({i,j});
+          }
           checked[i][j] = 1;
         }
       }
       // Atualiza-se o tabuleiro
       board = nBoard;
+      LifeCfg nCfg(n_alive);
+      Cfg.update(nCfg);
       // Printa-se o novo tabuleiro
       SimulationManager::print();
     }
