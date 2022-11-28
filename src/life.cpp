@@ -6,6 +6,7 @@
 #include "life.h"
 #include "tip.h"
 
+
 namespace life {
 /// Basic constructor that creates a life board with default dimensions.
 
@@ -69,6 +70,53 @@ SimulationManager::SimulationManager(const vector<vector<bool>>& input){
     this->board = input;
 }
 
+/// Saves an image as a **ascii** PPM file.
+bool SimulationManager::save_ppm3(const char* file_name,
+               const unsigned char* data,
+               size_t w,
+               size_t h,
+               size_t d)
+{
+  std::ofstream ofs_file(file_name, std::ios::out);
+  if (not ofs_file.is_open())
+    return false;
+
+    // TODO: Complete a geração do arquivo PPM!!
+
+
+  ofs_file.close();
+
+  return true;
+}
+
+// Example 1
+// Encode from raw pixels to disk with a single function call
+// The image argument has width * height RGBA pixels or width * height * 4 bytes
+void SimulationManager::encode_png(const char* filename, const unsigned char* image, unsigned width, unsigned height)
+{
+  // Encode the image
+  unsigned error = lodepng::encode(filename, image, width, height);
+
+  // if there's an error, display it
+  if (error)
+    std::cout << "encoder error " << error << ": " << lodepng_error_text(error) << std::endl;
+}
+
+/// Splits the input string based on `delimiter` into a list of substrings.
+std::vector<std::string> SimulationManager::split(const std::string & input_str, char delimiter){
+    // Store the tokens.
+    std::vector<std::string> tokens;
+    // read tokens from a string buffer.
+    std::istringstream iss;
+    iss.str(input_str);
+    // This will hold a single token temporarily.
+    std::string token;
+    while (std::getline(iss >> std::ws, token, delimiter))
+        tokens.emplace_back(token);
+    return tokens;
+}
+
+
 /// Atualiza as gerações de acordo com as regras
 string SimulationManager::play(void){
   size_t generations{0}; // Contador de gerações
@@ -98,6 +146,9 @@ string SimulationManager::play(void){
     }
     // Aplicar as regras e pular para proxima geração
     else{
+      // Reinicia-se o canvas
+      Can.clear(bkg);
+
       // Recolhe a Chave
       key = Cfg.get_key();
 
@@ -129,6 +180,7 @@ string SimulationManager::play(void){
           // Verifica-se as condições de acordo com as regras do jogo
           if(neighbor >= 4 || neighbor <= 1) nBoard[i][j] = 0;
           else if(neighbor == 3) {
+            Can.pixel(i,j);
             nBoard[i][j] = 1;
             n_alive.push_back({i,j});
           }
@@ -189,7 +241,8 @@ int SimulationManager::readConfig(void){
     if (not reader.parsing_ok()) {
         std::cout << ">>> Error while retrieving \"alive\" field." << '\n';
         std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
-    } 
+    }
+    alive = life::color_pallet[colorA];
 
     // Lendo a cor dos blocos onde não há ceĺulas
     auto colorBkg = reader.get_str("image","bkg");
@@ -197,6 +250,7 @@ int SimulationManager::readConfig(void){
         std::cout << ">>> Error while retrieving \"bkg\" field." << '\n';
         std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
     } 
+    bkg = life::color_pallet[colorBkg];
 
     // Lendo o tamanho do pixel virtual
     auto BlockS = reader.get_int("image","block_size");
@@ -217,16 +271,17 @@ int SimulationManager::readConfig(void){
     }
 
     // Try to get user current active status.
-    auto fps = reader.get_int("text", "fps");
+    auto f = reader.get_int("text", "fps");
     if (not reader.parsing_ok()) {
         std::cout << ">>> Error while retrieving \"fps\" field." << '\n';
         std::cout << "    Msg = " << std::quoted(reader.parser_error_msg()) << '\n';
     } else {
+      fps = f;
         //std::cout << "FPS value is " << fps << '\n';
     }
     Canvas Caux(nCol,nLin,BlockS);  // Canvas auxiliar que será jogado ao canvas principal
     // Aplica-se cor de fundo do canvas
-    Caux.clear(life::color_pallet[colorBkg]);
+    Caux.clear(bkg);
 
     // Lê-se o arquivo
     bReader.open(".config/board.txt");
@@ -255,7 +310,7 @@ int SimulationManager::readConfig(void){
             // Determina onde no board há células
             board[aux][i] = 1;
             // Aplica a Cor de célula viva no Canvas
-            Caux.pixel(aux,i,life::color_pallet[colorA]);
+            Caux.pixel(aux,i,alive);
             // Adiciona um objeto de Cell ao Vector auxiliar
             CfgR.push_back({aux,i});
           }

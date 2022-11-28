@@ -8,7 +8,7 @@
 namespace life {
             
 
-  Canvas::Canvas(size_t w = 0, size_t h = 0, short bs = 5){
+  Canvas::Canvas(size_t w, size_t h, short bs){
     m_width = w;
     m_height= h;
     m_block_size = bs;
@@ -25,12 +25,15 @@ namespace life {
   }
   /// Assignment operator.
   Canvas& Canvas::operator=(const Canvas& target){
-    Canvas(target);
+    this->m_pixels = target.m_pixels; 
+    this->m_height = target.m_height;
+    this->m_width = target.m_width;
+    this->m_block_size = target.m_block_size;    
   }
 
   //=== Members
   /// Clear the canvas with black color.
-  void Canvas::clear(const Color& c = BLACK){
+  void Canvas::clear(const Color& c){
     for(size_t i{0}; i <= (m_pixels.size()-image_depth);i+=image_depth){
         m_pixels[i] = c.channels[Color::R];
         m_pixels[i+1] = c.channels[Color::G];

@@ -29,9 +29,11 @@ int main(int argc, char* argv[])
 {   
     life::SimulationManager s;
     int r{s.readConfig()};
-    s.print();
-    std::string reason = s.play();
-    std::cout << "Fim de Jogo: " << reason << std::endl;
+    if(!r){
+        s.print();
+        std::string reason = s.play();
+        std::cout << "Fim de Jogo: " << reason << std::endl;
+    }
 
     return r;
 }

@@ -34,6 +34,7 @@ using std::vector;
 using std::unordered_map;
 
 #include "canvas.h"
+#include "lodepng.h"
 
 struct Cell {
   size_t row;
@@ -55,7 +56,7 @@ class LifeCfg {
   // Retorna a chave associada a uma configuração.
   std::string get_key(void) const;
   // Retorna as células vivas
-  std::vector<Cell> LifeCfg::set_alive(void) const;
+  std::vector<Cell> set_alive(void) const;
   // Verifica se todas as células morreram
   bool extinct(void) const;
   // Atualiza as Células vivas pra uma nova geração de acordo com as regras
@@ -97,6 +98,9 @@ class SimulationManager{
   LifeCfg Cfg; // Configuração da Aplicação
   SimulationLog Log; // Banco de dados de gerações
   Canvas Can; // Gerador de Imagens Canvas
+  Color alive; // Cor dos espaços vivos
+  Color bkg; // Cor para os espaços ondenão há células
+  size_t fps; // FPS de imagens a serem geradas
 
   public:
   // Ctro
@@ -111,6 +115,18 @@ class SimulationManager{
   // Printa no console o resultado de uma geração 
   void print(void);
 
+  // Gerador de imagens em png
+  void encode_png(const char* filename, const unsigned char* image, unsigned width, unsigned height);
+
+  // Divisor de strings em vector
+  std::vector<std::string> split(const std::string & input_str, char delimiter='.');
+
+  // Gerador de Imagens ppm
+  bool save_ppm3(const char* file_name,
+               const unsigned char* data,
+               size_t w,
+               size_t h,
+               size_t d=4);
 };
 
 
