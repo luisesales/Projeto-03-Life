@@ -4,7 +4,6 @@
  */
 
 #include "life.h"
-#include "tip.h"
 
 
 namespace life {

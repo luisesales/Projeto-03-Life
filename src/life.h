@@ -33,8 +33,10 @@ using std::string;
 using std::vector;
 using std::unordered_map;
 
-#include "canvas.h"
-#include "lodepng.h"
+#include "../lib/canvas.h"  
+#include "../lib/lodepng.h"
+#include "../lib/tip.h"
+
 
 struct Cell {
   size_t row;

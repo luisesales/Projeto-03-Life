@@ -23,7 +23,7 @@
 #include <iomanip>
 #include <string>
 
-#include "life.h"
+#include "life.cpp"
 
 int main(int argc, char* argv[])
 {   
